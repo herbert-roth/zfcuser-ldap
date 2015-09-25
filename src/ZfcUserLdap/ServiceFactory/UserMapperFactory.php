@@ -27,6 +27,7 @@ class UserMapperFactory implements FactoryInterface
         $mapper->setEntityPrototype(new $entityClass);
         $mapper->setDbAdapter($services->get('zfcuser_zend_db_adapter'));
         $mapper->setHydrator(new Hydrator\ClassMethods);
+        $mapper->setTableName($options->getTableName());
 
         return $mapper;
     }
