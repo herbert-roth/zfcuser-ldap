@@ -23,6 +23,7 @@ class UserHydrator extends ClassMethods
         /* @var $object UserInterface */
         $data = parent::extract($object);
         $data = $this->mapField('id', 'user_id', $data);
+        $data['roles'] = serialize($data['roles']);
         return $data;
     }
 
@@ -40,6 +41,7 @@ class UserHydrator extends ClassMethods
             throw new Exception\InvalidArgumentException('$object must be an instance of ZfcUser\Entity\UserInterface');
         }
         $data = $this->mapField('user_id', 'id', $data);
+        $data['roles'] = unserialize($data['roles']);
         return parent::hydrate($data, $object);
     }
 

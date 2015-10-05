@@ -56,21 +56,29 @@ class LdapIdentityProvider implements \BjyAuthorize\Provider\Identity\ProviderIn
         if (!$this->authService->hasIdentity()) {
             return array($this->getDefaultRole());
         }
+
         $rawObj = $this->authService->getIdentity()->getRoles();
-        $data = @unserialize($rawObj);
-        if ($data === false) {
-            return array($this->getDefaultRole());
-        }
-        $user = unserialize($rawObj);
+//        $data = @unserialize($rawObj);
+//        if ($data === false) {
+//            return array($this->getDefaultRole());
+//        }
+//        $user = unserialize($rawObj);
+
+        $user = $rawObj;
+
         if (is_null($user) || !is_array($user)) {
             return array($this->getDefaultRole());
         }
+
         $roles = array('user');
-        foreach ($user[$roleKey] as $role) {
+
+//        foreach ($user[$roleKey] as $role) {
+        foreach ($user as $role) {
             if (isset($definedRoles[$role])) {
                 $roles[] = $role;
             }
         }
+
         return $roles;
     }
 

@@ -100,7 +100,6 @@ class LdapAuth extends AbstractAdapter implements ServiceManagerAwareInterface
             }
         }
 
-        // Something happened that should never happen
         if (!$userObject) {
             $e->setCode(AuthenticationResult::FAILURE_IDENTITY_NOT_FOUND)
                     ->setMessages(array('A record with the supplied identity could not be found.'));
@@ -121,17 +120,22 @@ class LdapAuth extends AbstractAdapter implements ServiceManagerAwareInterface
         }
 
         // Set the roles for stuff like ZfcRbac
-        $userObject->setRoles($this->getMapper()->getLdapRoles($ldapObj));
+//        $role_key = $zulConfig['identity_providers']['ldap_role_key'];
+//        $usable_roles = $zulConfig['identity_providers']['usable_roles'];
+//        $ldapAuthAdapter->setUserArray($ldapObj);
+//        $roles = $ldapAuthAdapter->getRoles($role_key, $usable_roles);
+//        $userObject->setRoles($roles);
         // Success!
-        $e->setIdentity($userObject);
 
+        $e->setIdentity($userObject);
         $this->setSatisfied(true);
+
         $storage = $this->getStorage()->read();
         $storage['identity'] = $userObject;
         $this->getStorage()->write($storage);
+
         $e->setCode(AuthenticationResult::SUCCESS)
-                ->setMessages(array('Authentication successful.'))
-                ->stopPropagation();
+                ->setMessages(array('Authentication successful.'));
     }
 
     /**

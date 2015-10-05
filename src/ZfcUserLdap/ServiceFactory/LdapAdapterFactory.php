@@ -5,10 +5,10 @@
  *
  * For the full copyright and license information, please view
  * the file LICENSE.txt that was distributed with this source code.
- * 
+ *
  * @author Will Hattingh <w.hattingh@nitecon.com>
  *
- * 
+ *
  */
 
 namespace ZfcUserLdap\ServiceFactory;
@@ -30,6 +30,7 @@ class LdapAdapterFactory implements FactoryInterface
         $logger = $serviceLocator->get('ZfcUserLdap\Logger');
         $zulconfig = $serviceLocator->get('ZfcUserLdap\Config');
 
-        return new \ZfcUserLdap\Adapter\Ldap($config, $logger, $zulconfig['logging']['log_enabled']);
+        $adapter = '\\' . $zulconfig['adapter_class'];
+        return new $adapter($config, $logger, $zulconfig['logging']['log_enabled']);
     }
 }

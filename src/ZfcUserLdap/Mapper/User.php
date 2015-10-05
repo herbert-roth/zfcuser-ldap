@@ -17,15 +17,18 @@ class User extends AbstractUserMapper implements UserInterface, ServiceManagerAw
     {
         $select = $this->getSelect()->where(array('email' => $email));
         $entity = $this->select($select, $this->getEntity(), new HydratorInterface())->current();
+
         if (is_object($entity) && strlen($entity->getUsername()) > 0) {
             $this->getEventManager()->trigger('find', $this, array('entity' => $entity));
         }
+
         /* Now we select again so that it provides us with the ID as well
          * as assurance that the user made it into the database
          */
         $selectVerfify = $this->getSelect()->where(array('email' => $email));
         $verifiedEntity = $this->select($selectVerfify, $this->getEntity(), new HydratorInterface())->current();
         $this->getEventManager()->trigger('find', $this, array('entity' => $verifiedEntity));
+
         return $entity;
     }
 
@@ -33,15 +36,18 @@ class User extends AbstractUserMapper implements UserInterface, ServiceManagerAw
     {
         $select = $this->getSelect()->where(array('username' => $username));
         $entity = $this->select($select, $this->getEntity(), new HydratorInterface())->current();
+
         if (is_object($entity) && strlen($entity->getUsername()) > 0) {
             $this->getEventManager()->trigger('find', $this, array('entity' => $entity));
         }
+
         /* Now we select again so that it provides us with the ID as well
          * as assurance that the user made it into the database
          */
         $selectVerfify = $this->getSelect()->where(array('username' => $username));
         $verifiedEntity = $this->select($selectVerfify, $this->getEntity(), new HydratorInterface())->current();
         $this->getEventManager()->trigger('find', $this, array('entity' => $verifiedEntity));
+
         return $entity;
     }
 
@@ -50,6 +56,7 @@ class User extends AbstractUserMapper implements UserInterface, ServiceManagerAw
         $select = $this->getSelect()->where(array('user_id' => $id));
         $entity = $this->select($select)->current();
         $this->getEventManager()->trigger('find', $this, array('entity' => $entity));
+
         return $entity;
     }
 
@@ -109,61 +116,69 @@ class User extends AbstractUserMapper implements UserInterface, ServiceManagerAw
 
     /*
      * Creates a new User Entity
-     * 
+     *
      * @return User Entity
      */
 
     public function newEntity($ldapObject)
     {
+        $adapter = $this->serviceManager->get('ZfcUserLdap\LdapAdapter');
+        $adapter->setUserArray($ldapObject);
+
+        $zulConfig = $this->serviceManager->get('ZfcUserLdap\Config');
+        $role_key = $zulConfig['identity_providers']['ldap_role_key'];
+        $usable_roles = $zulConfig['identity_providers']['usable_roles'];
+
         $entity = $this->getEntity();
-        if (isset($ldapObject['uid']['0'])) {
-            $entity->setUsername($ldapObject['uid']['0']);
-            $entity->setDisplayName($ldapObject['cn']['0']);
-            $entity->setEmail($ldapObject['mail']['0']);
+        $username = $adapter->getUsername();
+
+        if (isset($username)) {
+            $entity->setUsername($username);
+            $entity->setDisplayName($adapter->getDisplayName());
+            $entity->setEmail($adapter->getEmail());
             $entity->setPassword(md5('HandledByLdap'));
-            $entity->setRoles(serialize($this->getLdapRoles($ldapObject)));
+            $entity->setRoles($adapter->getRoles($role_key, $usable_roles));
         }
+
         return $entity;
     }
 
     /**
      * Insert or Update DB entry depending if a User Object is set.
-     * 
+     *
      * @return User Entity
      */
     public function updateDb($ldapObject, $userObject)
     {
+        $adapter = $this->serviceManager->get('ZfcUserLdap\LdapAdapter');
+        $adapter->setUserArray($ldapObject);
+
+        $zulConfig = $this->serviceManager->get('ZfcUserLdap\Config');
+        $role_key = $zulConfig['identity_providers']['ldap_role_key'];
+        $usable_roles = $zulConfig['identity_providers']['usable_roles'];
+
         if ($userObject == null) {
             $entity = $this->getEntity();
         } else {
             $entity = $userObject;
         }
-        if (isset($ldapObject['uid']['0'])) {
-            $entity->setUsername($ldapObject['uid']['0']);
-            $entity->setDisplayName($ldapObject['cn']['0']);
-            $entity->setEmail($ldapObject['mail']['0']);
+
+        $username = $adapter->getUsername();
+
+        if (isset($username)) {
+            $entity->setUsername($username);
+            $entity->setDisplayName($adapter->getDisplayName());
+            $entity->setEmail($adapter->getEmail());
             $entity->setPassword(md5('HandledByLdap'));
-            $entity->setRoles(serialize($this->getLdapRoles($ldapObject)));
+            $entity->setRoles($adapter->getRoles($role_key, $usable_roles));
+
             if ($userObject == null) {
+//                $entity->setState(1);
                 $this->insert($entity, $this->tableName, new HydratorInterface());
             } else {
                 $this->update($entity, null, $this->tableName, new HydratorInterface());
             }
         }
         return $entity;
-    }
-
-    public function getLdapRoles($ldapObject)
-    {
-        $roles = array();
-        $config = $this->getServiceManager()->get('ZfcUserLdap\Config');
-        $roleKey = $config['identity_providers']['ldap_role_key'];
-
-        foreach ($ldapObject[$roleKey] as $role) {
-            if (in_array($role, $config['identity_providers']['usable_roles'])) {
-                $roles[] = $role;
-            }
-        }
-        return $roles;
     }
 }
