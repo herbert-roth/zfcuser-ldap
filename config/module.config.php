@@ -12,11 +12,12 @@ return array(
     'service_manager' => array(
         'invokables' => array(
             'ZfcUserLdap\Adapter\Ldap' => 'ZfcUserLdap\Adapter\Ldap',
-            'ZfcUserLdap\Authentication\Adapter\LdapAuth' => 'ZfcUserLdap\Authentication\Adapter\LdapAuth',
         ),
         'aliases' => array(
         ),
         'factories' => array(
+            'ZfcUserLdap\Authentication\Adapter\LdapAuth' => 'ZfcUserLdap\Authentication\Adapter\LdapAuthFactory',
+            'ZfcUserLdap\Adapter\Ldap' => 'ZfcUserLdap\Adapter\LdapFactory',
             'ZfcUserLdap\Config' => 'ZfcUserLdap\ServiceFactory\ZfcUserLdapConfigFactory',
             'ZfcUserLdap\LdapAdapter' => 'ZfcUserLdap\ServiceFactory\LdapAdapterFactory',
             'ZfcUserLdap\LdapConfig' => 'ZfcUserLdap\ServiceFactory\LdapConfigFactory',

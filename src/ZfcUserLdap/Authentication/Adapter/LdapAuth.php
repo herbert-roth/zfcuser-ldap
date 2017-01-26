@@ -3,7 +3,6 @@
 namespace ZfcUserLdap\Authentication\Adapter;
 
 use Zend\Authentication\Result as AuthenticationResult;
-use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\ServiceManager\ServiceManager;
 use ZfcUser\Authentication\Adapter\AbstractAdapter;
 use ZfcUser\Authentication\Adapter\AdapterChainEvent as AuthEvent;
@@ -13,7 +12,7 @@ use ZfcUserLdap\Mapper\UserHydrator;
 use Zend\Validator\EmailAddress;
 use Zend\Authentication\Exception\UnexpectedValueException as UnexpectedExc;
 
-class LdapAuth extends AbstractAdapter implements ServiceManagerAwareInterface
+class LdapAuth extends AbstractAdapter
 {
 
     /**

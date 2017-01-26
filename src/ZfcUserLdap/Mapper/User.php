@@ -5,10 +5,9 @@ namespace ZfcUserLdap\Mapper;
 use ZfcUser\Mapper\User as AbstractUserMapper;
 use ZfcUser\Mapper\UserInterface;
 use ZfcUserLdap\Mapper\UserHydrator as HydratorInterface;
-use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\ServiceManager\ServiceManager;
 
-class User extends AbstractUserMapper implements UserInterface, ServiceManagerAwareInterface
+class User extends AbstractUserMapper implements UserInterface
 {
 
     protected $tableName = 'user';
